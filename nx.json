@@ -22,5 +22,16 @@
       }
     }
   },
-  "projects": {}
+  "projects": {
+    "insta-share": {
+      "tags": []
+    },
+    "insta-share-e2e": {
+      "tags": [],
+      "implicitDependencies": ["insta-share"]
+    },
+    "instashare-service": {
+      "tags": []
+    }
+  }
 }

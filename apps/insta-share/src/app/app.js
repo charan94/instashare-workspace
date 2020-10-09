@@ -1,29 +1,23 @@
 import React, { Component } from 'react';
 import './app.scss';
-import { ReactComponent as Logo } from './logo.svg';
-import star from './star.svg';
-import { Route, Link } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import TopBar from './components/shared/top-bar/top-bar';
+import Login from './components/auth/login/login';
+import PrivateRoute from './components/private-route/private-route';
 import Dashboard from './components/dashboard/dashboard';
+import Register from './components/auth/register/register';
 
 export class App extends Component {
   render() {
     return (
       <div>
-        <Route
-          path="/"
-          exact
-          component={Dashboard}
-        />
-        <Route
-          path="/page-2"
-          exact
-          render={() => (
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          )}
-        />
-        {/* END: routes */}
+        <TopBar />
+        <Switch>
+            <Route key="login" path="/login" component={Login}  />
+            <Route key="register" path="/register" component={Register} />
+            <PrivateRoute path="/" component={Dashboard} />
+            <Redirect key="login-redirect" to="/login" />
+        </Switch>
       </div>
     );
   }

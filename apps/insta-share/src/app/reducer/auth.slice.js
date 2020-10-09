@@ -26,17 +26,16 @@ export const authAdapter = createEntityAdapter();
 export const fetchAuth = createAsyncThunk(
   'auth/fetchStatus',
   async (_, thunkAPI) => {
-    /**
-     * Replace this with your custom fetch call.
-     * For example, `return myApi.getAuths()`;
-     * Right now we just return an empty array.
-     */
+   postMessage()
     return Promise.resolve([]);
   }
 );
 export const initialAuthState = authAdapter.getInitialState({
   loadingStatus: 'not loaded',
   error: null,
+  user: null,
+  isAuthenticated: false,
+  token: null
 });
 export const authSlice = createSlice({
   name: AUTH_FEATURE_KEY,
@@ -44,7 +43,7 @@ export const authSlice = createSlice({
   reducers: {
     add: authAdapter.addOne,
     remove: authAdapter.removeOne,
-    // ...
+    
   },
   extraReducers: (builder) => {
     builder

@@ -47,7 +47,7 @@ export class AuthController {
             throw new HttpException({ error: 'User already exists' }, 500);
         }
         const { email, firstName, lastName } = await this.userService.register(body);
-        const token = this.authService.createToken(user);
+        const token = this.authService.createToken(body);
         return res.status(HttpStatus.OK).json({ email, firstName, lastName, token });
     }
 }

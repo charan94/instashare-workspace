@@ -15,7 +15,6 @@ export class AuthService {
         const expiresIn = 3600;
         const accessToken = jwt.sign(
             {
-                id: user.id,
                 email: user.email,
                 firstname: user.firstName,
                 lastname: user.lastName,

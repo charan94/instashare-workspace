@@ -1,0 +1,35 @@
+.navbar-container {
+    width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.upload-btn {
+    text-decoration: none !important;
+}
+
+@media (min-width: 576px) {
+    .navbar-container {
+      max-width: 540px;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .navbar-container {
+      max-width: 720px;
+    }
+  }
+  
+  @media (min-width: 992px) {
+    .navbar-container {
+      max-width: 960px;
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .navbar-container {
+      max-width: 1040px;
+    }
+  }

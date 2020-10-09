@@ -2,6 +2,7 @@ import { UserModel } from './../../models/user';
 import { UserService } from './../../user/service/user.service';
 import { Injectable, Logger } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken'
+import { environment } from 'apps/instashare-service/src/environments/environment';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
                 firstname: user.firstName,
                 lastname: user.lastName,
             },
-            'instashare12#$%',
+            environment.JWT_SECRET,
             { expiresIn },
         );
         return {

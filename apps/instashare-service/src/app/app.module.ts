@@ -11,6 +11,7 @@ import { UserModule } from './user/user.module';
 import { getMetadataArgsStorage } from 'typeorm';
 import { ORM_CONFIG } from './config/orm.config';
 import { PassportModule } from '@nestjs/passport';
+import { environment } from '../environments/environment';
 
 @Module({
   imports: [
@@ -21,8 +22,8 @@ import { PassportModule } from '@nestjs/passport';
     UserModule,
     PassportModule,
     JwtModule.register({
-      secret: 'instashare12#$%',
-      signOptions: { expiresIn: 3600 },
+      secret: environment.JWT_SECRET,
+      signOptions: { expiresIn: environment.JWT_EXPIRY },
     })
   ],
   controllers: [AuthController, UtilController],

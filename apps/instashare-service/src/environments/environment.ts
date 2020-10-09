@@ -4,5 +4,7 @@ export const environment = {
   MYSQL_PORT: 3306,
   MYSQL_USER_NAME: 'instashareuser',
   MYSQL_PASS: 'Passw0rd12',
-  MYSQL_DB_NAME: 'instashare'
+  MYSQL_DB_NAME: 'instashare',
+  JWT_SECRET: 'instashare12#$%',
+  JWT_EXPIRY: 3600
 };

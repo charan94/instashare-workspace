@@ -41,6 +41,13 @@ export const registerAction = createAsyncThunk(
   }
 )
 
+export const updateError = createAsyncThunk(
+  'auth/error',
+  (payload, thunkAPI) => {
+    return payload;    
+  }
+)
+
 export const initialAuthState = authAdapter.getInitialState({
   loadingStatus: 'not loaded',
   error: null,
@@ -48,6 +55,7 @@ export const initialAuthState = authAdapter.getInitialState({
   isAuthenticated: false,
   token: null
 });
+
 export const authSlice = createSlice({
   name: AUTH_FEATURE_KEY,
   initialState: initialAuthState,
@@ -59,16 +67,23 @@ export const authSlice = createSlice({
     builder
       .addCase(loginAction.fulfilled, (state, action) => {
         if (action.payload) {
-          const user = {
-            email: action.payload && action.payload.email ? action.payload.email : '',
-            firstName: action.payload && action.payload.firstName ? action.payload.firstName : '',
-            lastName: action.payload && action.payload.lastName ? action.payload.lastName : '',
+          console.log('action ', action);
+          if (action.payload.statusCode && action.payload.statusCode !== 200) {
+            state.isAuthenticated = false;
+            state.error = 'Invalid username or password';
+          } else {
+            const user = {
+              email: action.payload && action.payload.email ? action.payload.email : '',
+              firstName: action.payload && action.payload.firstName ? action.payload.firstName : '',
+              lastName: action.payload && action.payload.lastName ? action.payload.lastName : '',
+            }
+            const token = action.payload && action.payload.token ? action.payload.token.accessToken : null;
+            state.token = token;
+            localStorage.setItem('auth_token', token);
+            state.isAuthenticated = token !== null ? true : false;
+            state.user = user;
+            state.error = null;
           }
-          const token = action.payload && action.payload.token ? action.payload.token.accessToken : null;
-          state.token = token;
-          localStorage.setItem('auth_token', token);
-          state.isAuthenticated = token !== null ? true : false;
-          state.user = user;
         }
       })
       .addCase(loginAction.rejected, (state, action) => {
@@ -76,6 +91,7 @@ export const authSlice = createSlice({
       })
       .addCase(triggerLogout.fulfilled, (state, action) => {
         if (action.payload) {
+          state.error = null;
           state.isAuthenticated = false;
           state.user = null;
           state.token = null;
@@ -83,22 +99,34 @@ export const authSlice = createSlice({
         }
       })
       .addCase(registerAction.fulfilled, (state, action) => {
+        console.log('action ', action);
         if (action.payload) {
-          const user = {
-            email: action.payload && action.payload.email ? action.payload.email : '',
-            firstName: action.payload && action.payload.firstName ? action.payload.firstName : '',
-            lastName: action.payload && action.payload.lastName ? action.payload.lastName : '',
+          if (action.payload.error) {
+            state.isAuthenticated = false;
+            state.error = action.payload.error;
+          } else {
+            const user = {
+              email: action.payload && action.payload.email ? action.payload.email : '',
+              firstName: action.payload && action.payload.firstName ? action.payload.firstName : '',
+              lastName: action.payload && action.payload.lastName ? action.payload.lastName : '',
+            }
+            const token = action.payload && action.payload.token ? action.payload.token.accessToken : null;
+            state.token = token;
+            localStorage.setItem('auth_token', token);
+            state.isAuthenticated = token !== null ? true : false;
+            state.user = user;
+            state.error = null;
           }
-          const token = action.payload && action.payload.token ? action.payload.token.accessToken : null;
-          state.token = token;
-          localStorage.setItem('auth_token', token);
-          state.isAuthenticated = token !== null ? true : false;
-          state.user = user;
         }
       })
       .addCase(registerAction.rejected, (state, action) => {
         state.isAuthenticated = false;
       })
+      .addCase(updateError.fulfilled, (state, action) => {
+        if(action.payload) {
+          state.error = null;
+        }
+      });
   },
 });
 

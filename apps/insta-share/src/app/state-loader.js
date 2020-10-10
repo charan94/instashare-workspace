@@ -1,6 +1,6 @@
 export class StateLoader {
 
-    constructor() {}
+    constructor() { }
 
     loadState() {
         try {
@@ -29,9 +29,12 @@ export class StateLoader {
 
     initializeState() {
         return {
-            isAuthenticated: false,
-            user: null,
-            token: null
+            auth: {
+                isAuthenticated: false,
+                user: null,
+                token: null
+            },
+            upload: {}
         }
     };
 }

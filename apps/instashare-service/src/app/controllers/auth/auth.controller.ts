@@ -12,19 +12,20 @@ export class AuthController {
     @UseGuards(AuthGuard('local'))
     @Post('/login')
     async login(@Res() res, @Body() body) {
+        console.log('bdy ', body);
         if (!body.email) {
             throw new HttpException({ error: 'Email is Required' }, 500);
         }
         if (!body.password) {
             throw new HttpException({ error: 'Password is Required' }, 500);
         }
-        const user = await this.userService.findByEmail(body.email);
-        if (!user) {
-            throw new HttpException({ error: 'Invalid User' }, 500);
+        const user = await this.authService.validateUser(body.email, body.password);
+        if(user !== null) {
+            const token = this.authService.createToken(user);
+            return res.status(HttpStatus.OK).json({ email: user.email, firstName: user.firstName, lastName: user.lastName, token });
+        } else {
+            return res.status(HttpStatus.UNAUTHORIZED).json({ error: 'Incorrect Email or Password' });
         }
-        const { email, firstName, lastName } = user;
-        const token = this.authService.createToken(user);
-        return res.status(HttpStatus.OK).json({ email, firstName, lastName, token });
     }
 
     

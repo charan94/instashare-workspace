@@ -18,7 +18,8 @@ export const initialUploadState = uploadAdapter.getInitialState({
   loadingStatus: 'not loaded',
   error: null,
   upload: false,
-  files: []
+  files: [],
+  
 });
 export const uploadSlice = createSlice({
   name: UPLOAD_FEATURE_KEY,

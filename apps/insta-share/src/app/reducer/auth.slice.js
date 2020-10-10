@@ -4,32 +4,43 @@ import {
   createSelector,
   createSlice,
 } from '@reduxjs/toolkit';
+import { environment } from '../../environments/environment';
 export const AUTH_FEATURE_KEY = 'auth';
 export const authAdapter = createEntityAdapter();
-/**
- * Export an effect using createAsyncThunk from
- * the Redux Toolkit: https://redux-toolkit.js.org/api/createAsyncThunk
- *
- * e.g.
- * ```
- * import React, { useEffect } from 'react';
- * import { useDispatch } from 'react-redux';
- *
- * // ...
- *
- * const dispatch = useDispatch();
- * useEffect(() => {
- *   dispatch(fetchAuth())
- * }, [dispatch]);
- * ```
- */
-export const fetchAuth = createAsyncThunk(
-  'auth/fetchStatus',
-  async (_, thunkAPI) => {
-   postMessage()
-    return Promise.resolve([]);
+
+export const loginAction = createAsyncThunk(
+  'auth/login',
+  async (payload, thunkAPI) => {
+    const url = `${environment.API_URL}/auth/login`;
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'application/json; charset=utf-8' }
+    });
+    return await response.json();
   }
 );
+
+export const triggerLogout = createAsyncThunk(
+  'auth/logout',
+  (payload, thunkAPI) => {
+    return payload ? payload : null;
+  }
+)
+
+export const registerAction = createAsyncThunk(
+  'auth/register',
+  async (payload, thunkAPI) => {
+    const url = `${environment.API_URL}/auth/register`;
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'application/json; charset=utf-8' }
+    });
+    return await response.json();
+  }
+)
+
 export const initialAuthState = authAdapter.getInitialState({
   loadingStatus: 'not loaded',
   error: null,
@@ -43,60 +54,58 @@ export const authSlice = createSlice({
   reducers: {
     add: authAdapter.addOne,
     remove: authAdapter.removeOne,
-    
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAuth.pending, (state) => {
-        state.loadingStatus = 'loading';
+      .addCase(loginAction.fulfilled, (state, action) => {
+        if (action.payload) {
+          const user = {
+            email: action.payload && action.payload.email ? action.payload.email : '',
+            firstName: action.payload && action.payload.firstName ? action.payload.firstName : '',
+            lastName: action.payload && action.payload.lastName ? action.payload.lastName : '',
+          }
+          const token = action.payload && action.payload.token ? action.payload.token.accessToken : null;
+          state.token = token;
+          localStorage.setItem('auth_token', token);
+          state.isAuthenticated = token !== null ? true : false;
+          state.user = user;
+        }
       })
-      .addCase(fetchAuth.fulfilled, (state, action) => {
-        authAdapter.setAll(state, action.payload);
-        state.loadingStatus = 'loaded';
+      .addCase(loginAction.rejected, (state, action) => {
+        state.isAuthenticated = false;
       })
-      .addCase(fetchAuth.rejected, (state, action) => {
-        state.loadingStatus = 'error';
-        state.error = action.error.message;
-      });
+      .addCase(triggerLogout.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.isAuthenticated = false;
+          state.user = null;
+          state.token = null;
+          localStorage.clear();
+        }
+      })
+      .addCase(registerAction.fulfilled, (state, action) => {
+        if (action.payload) {
+          const user = {
+            email: action.payload && action.payload.email ? action.payload.email : '',
+            firstName: action.payload && action.payload.firstName ? action.payload.firstName : '',
+            lastName: action.payload && action.payload.lastName ? action.payload.lastName : '',
+          }
+          const token = action.payload && action.payload.token ? action.payload.token.accessToken : null;
+          state.token = token;
+          localStorage.setItem('auth_token', token);
+          state.isAuthenticated = token !== null ? true : false;
+          state.user = user;
+        }
+      })
+      .addCase(registerAction.rejected, (state, action) => {
+        state.isAuthenticated = false;
+      })
   },
 });
-/*
- * Export reducer for store configuration.
- */
+
 export const authReducer = authSlice.reducer;
-/*
- * Export action creators to be dispatched. For use with the `useDispatch` hook.
- *
- * e.g.
- * ```
- * import React, { useEffect } from 'react';
- * import { useDispatch } from 'react-redux';
- *
- * // ...
- *
- * const dispatch = useDispatch();
- * useEffect(() => {
- *   dispatch(authActions.add({ id: 1 }))
- * }, [dispatch]);
- * ```
- *
- * See: https://react-redux.js.org/next/api/hooks#usedispatch
- */
+
 export const authActions = authSlice.actions;
-/*
- * Export selectors to query state. For use with the `useSelector` hook.
- *
- * e.g.
- * ```
- * import { useSelector } from 'react-redux';
- *
- * // ...
- *
- * const entities = useSelector(selectAllAuth);
- * ```
- *
- * See: https://react-redux.js.org/next/api/hooks#useselector
- */
+
 const { selectAll, selectEntities } = authAdapter.getSelectors();
 export const getAuthState = (rootState) => rootState[AUTH_FEATURE_KEY];
 export const selectAllAuth = createSelector(getAuthState, selectAll);

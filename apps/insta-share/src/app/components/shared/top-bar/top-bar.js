@@ -1,55 +1,55 @@
-import React, { Component } from 'react';
-import { Route, Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import './top-bar.scss';
 import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
-export class TopBar extends Component {
-  constructor(props) {
-    super(props);
+import { getAuthState, triggerLogout } from '../../../reducer/auth.slice';
+
+export const TopBar = () => {
+  const dispatch = useDispatch();
+  const authState = useSelector(getAuthState);
+  const [upload, setUpload] = useState(false);
+  const [logout, setLogout] = useState(false);
+
+  useEffect(() => {
+    if (logout) {
+      dispatch(triggerLogout(logout));
+      setLogout(false);
+    }
+  }, [dispatch, logout, setLogout, upload, setUpload]);
+
+
+  function getActionButtons() {
+    return authState.isAuthenticated ? (
+      <ul className="navbar-nav align-items-lg-center ml-auto">
+        <li className="nav-item d-none d-block ml-lg-4">
+          <Button variant="link" color="dark" className="upload-btn" onClick={() => setUpload(true)}>
+            <span>
+              <i className="fa fa-cloud-upload mr-2"></i>
+            </span>
+            <span>Upload</span>
+          </Button>
+        </li>
+        <li className="nav-item d-none d-block ml-lg-4">
+          <Button variant="link" color="dark" className="logout-btn" onClick={(e) => setLogout(true)}>
+            <span>
+              <i className="fa fa-sign-out mr-2"></i>
+            </span>
+            <span>Logout</span>
+          </Button>
+        </li>
+      </ul>
+    ) : null;
   }
 
-  render() {
-    return (
-      <Navbar bg="bg-transparent" variant="light">
-        <div className="navbar-container d-flex">
-          <Navbar.Brand href="/" >InstaShare</Navbar.Brand>
-            <ul className="navbar-nav align-items-lg-center ml-auto">
-              <li className="nav-item">
-                <a className="nav-link" href="https://www.facebook.com" target="_blank">
-                  <i className="fa fa-facebook-square"></i>
-                  <span className="nav-link-inner--text d-none">Facebook</span>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="https://www.instagram.com" target="_blank">
-                  <i className="fa fa-instagram"></i>
-                  <span className="nav-link-inner--text d-none">Instagram</span>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="https://twitter.com" target="_blank">
-                  <i className="fa fa-twitter-square"></i>
-                  <span className="nav-link-inner--text d-none">Twitter</span>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="https://github.com" target="_blank">
-                  <i className="fa fa-github"></i>
-                  <span className="nav-link-inner--text d-none">Github</span>
-                </a>
-              </li>
-              <li className="nav-item d-none d-block ml-lg-4">
-                <Button variant="link" className="upload-btn">
-                  <span>
-                    <i className="fa fa-cloud-upload mr-2"></i>
-                  </span>
-                  <span>Upload</span>
-                </Button>
-              </li>
-            </ul>
-        </div>
-      </Navbar>
-    );
-  }
+
+  return (
+    <Navbar bg={`${authState.isAuthenticated ? 'dark' : 'bg-transparent'}`} variant={`${authState.isAuthenticated ? 'dark' : 'light'}`}>
+      <div className="navbar-container d-flex">
+        <Navbar.Brand href="/" >InstaShare</Navbar.Brand>
+        {getActionButtons()}
+      </div>
+    </Navbar>
+  );
 }
 export default TopBar;

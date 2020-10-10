@@ -6,9 +6,12 @@
   margin-left: auto;
 }
 
+.logout-btn,
 .upload-btn {
     text-decoration: none !important;
+    color: #fff !important;
 }
+
 
 @media (min-width: 576px) {
     .navbar-container {

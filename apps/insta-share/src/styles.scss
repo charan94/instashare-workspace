@@ -3,7 +3,7 @@
 
 body {
   margin: 0;
-  font-family: $fontFamily;
+  font-family: $fontFamily !important;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
@@ -16,4 +16,15 @@ body {
   text-transform: normal;
   letter-spacing: 0;
   transition: all 0.15s linear;
+}
+
+.section {
+  position: relative;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.section-lg {
+  padding-top: calc(100% - 95%);
+  padding-bottom: calc(100% - 95%);
 }

@@ -6,6 +6,7 @@ import Login from './components/auth/login/login';
 import PrivateRoute from './components/private-route/private-route';
 import Dashboard from './components/dashboard/dashboard';
 import Register from './components/auth/register/register';
+import Auth from './components/auth/auth';
 
 export class App extends Component {
   render() {
@@ -13,10 +14,9 @@ export class App extends Component {
       <div>
         <TopBar />
         <Switch>
-            <Route key="login" path="/login" component={Login}  />
-            <Route key="register" path="/register" component={Register} />
+            <Route key="authKey" path={`/auth/:name`} component={Auth}  />
             <PrivateRoute path="/" component={Dashboard} />
-            <Redirect key="login-redirect" to="/login" />
+            <Redirect key="login-redirect" to="/auth/login" />
         </Switch>
       </div>
     );

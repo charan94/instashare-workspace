@@ -4,10 +4,12 @@ import './top-bar.scss';
 import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
 import { getAuthState, triggerLogout } from '../../../reducer/auth.slice';
+import { getUploadState, showUploadModalAction } from '../../../reducer/upload.slice';
 
 export const TopBar = () => {
   const dispatch = useDispatch();
   const authState = useSelector(getAuthState);
+  const updateState = useSelector(getUploadState);
   const [upload, setUpload] = useState(false);
   const [logout, setLogout] = useState(false);
 
@@ -15,6 +17,10 @@ export const TopBar = () => {
     if (logout) {
       dispatch(triggerLogout(logout));
       setLogout(false);
+    }
+    if(upload) {
+      dispatch(showUploadModalAction(true));
+      setUpload(false);
     }
   }, [dispatch, logout, setLogout, upload, setUpload]);
 

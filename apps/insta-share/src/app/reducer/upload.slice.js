@@ -14,12 +14,18 @@ export const fileUploadAction = createAsyncThunk(
   }
 )
 
+export const showUploadModalAction = createAsyncThunk(
+  'upload/showUploadModal',
+  (payload, thunkAPI) => {
+    return payload;
+  }
+)
+
 export const initialUploadState = uploadAdapter.getInitialState({
-  loadingStatus: 'not loaded',
   error: null,
   upload: false,
-  files: [],
-  
+  showUploadModal: false,
+  files: []
 });
 export const uploadSlice = createSlice({
   name: UPLOAD_FEATURE_KEY,
@@ -30,17 +36,19 @@ export const uploadSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fileUploadAction.pending, (state) => {
-        state.loadingStatus = 'loading';
+      .addCase(fileUploadAction.pending, (state, action) => {
+        
       })
       .addCase(fileUploadAction.fulfilled, (state, action) => {
         uploadAdapter.setAll(state, action.payload);
-        state.loadingStatus = 'loaded';
       })
       .addCase(fileUploadAction.rejected, (state, action) => {
         state.loadingStatus = 'error';
         state.error = action.error.message;
-      });
+      })
+      .addCase(showUploadModalAction.fulfilled, (state, action) => {
+        state.showUploadModal = action.payload;
+      })
   },
 });
 /*

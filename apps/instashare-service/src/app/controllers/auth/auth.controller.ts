@@ -12,7 +12,6 @@ export class AuthController {
     @UseGuards(AuthGuard('local'))
     @Post('/login')
     async login(@Res() res, @Body() body) {
-        console.log('bdy ', body);
         if (!body.email) {
             throw new HttpException({ error: 'Email is Required' }, 500);
         }

@@ -10,7 +10,7 @@ export const uploadAdapter = createEntityAdapter();
 export const fileUploadAction = createAsyncThunk(
   'upload/file',
   async (payload, thunkAPI) => {
-    return null;
+    return { data: payload.data };
   }
 )
 
@@ -40,7 +40,7 @@ export const uploadSlice = createSlice({
         
       })
       .addCase(fileUploadAction.fulfilled, (state, action) => {
-        uploadAdapter.setAll(state, action.payload);
+        state.files = [...action.payload.data];
       })
       .addCase(fileUploadAction.rejected, (state, action) => {
         state.loadingStatus = 'error';

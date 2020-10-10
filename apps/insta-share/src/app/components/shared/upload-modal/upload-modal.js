@@ -12,33 +12,33 @@ export const UploadModal = (props) => {
   const [files, setFiles] = useState([]);
   const [modalOpened, setModalOpened] = useState(false);
   useEffect(() => {
-    if(!showUploadModal && modalOpened) {
+    if (!showUploadModal && modalOpened) {
       dispatch(showUploadModalAction(false));
       setModalOpened(false);
     }
   }, [dispatch, showUploadModal, setShowUploadModal, files, setFiles, modalOpened, setModalOpened]);
 
   function hideModal(val) {
-    if(val) {
+    if (val) {
       setModalOpened(true);
       setShowUploadModal(false);
     }
   }
 
   return (
-     <Modal show={uploadState.showUploadModal || showUploadModal} onHide={() => { hideModal(true) }}>
-        <Modal.Header closeButton>
-          <Modal.Title>Upload Files</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => { hideModal(true) }}>
-            Close
+    <Modal show={uploadState.showUploadModal || showUploadModal} onHide={() => { hideModal(true) }}>
+      <Modal.Header closeButton>
+        <Modal.Title>Upload Files</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={() => { hideModal(true) }}>
+          Close
           </Button>
-        </Modal.Footer>
-      </Modal>
+      </Modal.Footer>
+    </Modal>
   );
 };
 export default UploadModal;

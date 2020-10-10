@@ -67,7 +67,6 @@ export const authSlice = createSlice({
     builder
       .addCase(loginAction.fulfilled, (state, action) => {
         if (action.payload) {
-          console.log('action ', action);
           if (action.payload.statusCode && action.payload.statusCode !== 200) {
             state.isAuthenticated = false;
             state.error = 'Invalid username or password';
@@ -99,7 +98,6 @@ export const authSlice = createSlice({
         }
       })
       .addCase(registerAction.fulfilled, (state, action) => {
-        console.log('action ', action);
         if (action.payload) {
           if (action.payload.error) {
             state.isAuthenticated = false;

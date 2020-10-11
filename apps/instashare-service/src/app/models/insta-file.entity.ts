@@ -14,7 +14,7 @@ export class InstaFile {
     fileStatus: string;
 
     @Column()
-    fileSize: string;
+    fileSize: number;
 
     @Column()
     uploadedDate: number;

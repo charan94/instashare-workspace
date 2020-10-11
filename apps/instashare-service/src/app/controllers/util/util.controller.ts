@@ -1,7 +1,7 @@
 import { UserService } from './../../user/service/user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UtilService } from './../../service/util/util.service';
-import { Controller, Post, UploadedFiles, UseInterceptors, Logger, UseGuards, Body, Get, Query, HttpException, Param } from '@nestjs/common';
+import { Controller, Post, UploadedFiles, UseInterceptors, Logger, UseGuards, Body, Get, Query, HttpException, Param, Delete, Put } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('util')
@@ -24,7 +24,7 @@ export class UtilController {
         if (!user) {
             throw new HttpException({ error: 'Cannot upload files to this user' }, 500);
         }
-        const result:any = await this.utilService.uploadFiles(files, user, uploadedDate);
+        const result: any = await this.utilService.uploadFiles(files, user, uploadedDate);
         return Promise.resolve({ status: true, data: result.data });
     }
 
@@ -38,5 +38,29 @@ export class UtilController {
         }
         const result = await this.utilService.getFiles(user);
         return result;
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('/file/:id')
+    async getFile(@Param('id') id: number) {
+        const result = await this.utilService.getFileById(id);
+        return result;
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Delete('/file/delete/:id')
+    async deleteFile(@Param('id') id: number) {
+        await this.utilService.markForDelete(id);
+        return { status: true, id: id };
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Put('/file/:id')
+    @UseInterceptors(
+        FilesInterceptor('insta-file')
+    )
+    async editFile(@Param('id') id: number, @Body() body) {
+        const result = await this.utilService.deleteFile(id);
+        return { data: result };
     }
 }

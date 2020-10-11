@@ -12,6 +12,8 @@ import { getMetadataArgsStorage } from 'typeorm';
 import { ORM_CONFIG, MONGO_URL } from './config/orm.config';
 import { PassportModule } from '@nestjs/passport';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
+import { SchedulerService } from './service/scheduler.service';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -26,13 +28,15 @@ import { MongooseModule } from '@nestjs/mongoose';
     JwtModule.register({
       secret: 'instashare12#$%',
       signOptions: { expiresIn: 3600 },
-    })
+    }),
+    ScheduleModule.forRoot()
   ],
   controllers: [AuthController, UtilController],
   providers: [
     AuthService,
     LocalStrategy,
-    JwtStrategy
+    JwtStrategy,
+    SchedulerService
   ],
 })
 export class AppModule { }

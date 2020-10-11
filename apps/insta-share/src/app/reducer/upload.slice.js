@@ -5,6 +5,8 @@ import {
   createSlice,
 } from '@reduxjs/toolkit';
 import { environment } from '../../environments/environment';
+import { saveAs } from 'file-saver';
+
 export const UPLOAD_FEATURE_KEY = 'upload';
 export const uploadAdapter = createEntityAdapter();
 
@@ -27,7 +29,21 @@ export const getFilesAction = createAsyncThunk(
     const url = `${environment.API_URL}/util/files`;
     const response = await fetch(url, {
       method: 'POST',
-      body: JSON.stringify({"email": payload.email}),
+      body: JSON.stringify({ "email": payload.email }),
+      headers: { 'Authorization': `Bearer ${payload.apiKey}`, 'Content-Type': 'application/json' }
+    });
+    return response.json();
+  }
+)
+
+export const fileDownloadAction = createAsyncThunk(
+  '/upload/attachment/download',
+  async (payload, thunkAPI) => {
+    console.log('payload ', payload);
+    const url = `${environment.API_URL}/util/file/${payload.id}`;
+    const response = await fetch(url, {
+      method: 'GET',
+
       headers: { 'Authorization': `Bearer ${payload.apiKey}`, 'Content-Type': 'application/json' }
     });
     return response.json();
@@ -41,13 +57,28 @@ export const showUploadModalAction = createAsyncThunk(
   }
 )
 
+export const deleteFileAction = createAsyncThunk(
+  'upload/file/delete',
+  async (payload, thunkAPI) => {
+    console.log('payload ', payload);
+    const url = `${environment.API_URL}/util/file/delete/${payload.id}`;
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${payload.apiKey}` }
+    });
+    return response.json();
+  }
+)
+
 export const initialUploadState = uploadAdapter.getInitialState({
   error: null,
   upload: false,
   showUploadModal: false,
   files: [],
-  tempFiles: []
+  tempFiles: [],
+  editFile: null
 });
+
 export const uploadSlice = createSlice({
   name: UPLOAD_FEATURE_KEY,
   initialState: initialUploadState,
@@ -78,17 +109,34 @@ export const uploadSlice = createSlice({
       })
       .addCase(getFilesAction.fulfilled, (state, action) => {
         state.reload = false;
-        if(action.payload && action.payload.data) {
+        if (action.payload && action.payload.data) {
           state.files = [...action.payload.data];
         } else {
           state.files = [];
         }
       })
+      .addCase(fileDownloadAction.fulfilled, (state, action) => {
+        if (action.payload && action.payload.data && action.payload.data.file) {
+          const dataURI = `data:text/zip;base64,${action.payload.data.file}`;
+          const fileName = action.payload.data.fileName;
+          saveAs(dataURI, `${fileName.substring(0, fileName.lastIndexOf('.'))}.zip`);
+        }
+      })
+      .addCase(deleteFileAction.pending, (state, action) => {
+        console.log('action ', action);
+        const files = state.files.filter(r => r.id === action.meta.arg.data.id);
+        state.files = state.tempFiles = [...files]
+      })
+      .addCase(deleteFileAction.fulfilled, (state, action) => {
+        console.log('action ', action);
+        if (action.payload && action.payload.status) {
+          const files = state.files;
+          state.files = [...files.filter(r => r.id !== action.payload.id)]
+        }
+      })
   },
 });
-/*
- * Export reducer for store configuration.
- */
+
 export const uploadReducer = uploadSlice.reducer;
 
 export const uploadActions = uploadSlice.actions;

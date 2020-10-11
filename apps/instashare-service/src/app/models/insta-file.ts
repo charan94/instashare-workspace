@@ -1,10 +1,10 @@
 export class InstaFileModel {
-    id: number;
-    fileName: string;
-    fileStatus: string;
-    fileSize: string;
-    uploadedDate: number;
-    file: any;
+    id?: number;
+    fileName?: string;
+    fileStatus?: string;
+    fileSize?: number;
+    uploadedDate?: number;
+    file?: any;
     modifiedFile?: any;
-    mimeType: string;
+    mimeType?: string;
 }

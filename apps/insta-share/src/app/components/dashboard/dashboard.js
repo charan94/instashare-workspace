@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fileUploadAction, getFilesAction, getUploadState } from '../../reducer/upload.slice';
+import { deleteFileAction, fileDownloadAction, fileUploadAction, getFilesAction, getUploadState } from '../../reducer/upload.slice';
 import './dashboard.scss';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
@@ -18,6 +18,9 @@ export const Dashboard = () => {
   const [hasUploaded, setHasUploaded] = useState(false);
   const [getUploadedFiles, setGetUploadedFiles] = useState(false);
   const [getFilesFromServer, setGetFilesFromServer] = useState(true);
+  const [downloadAttachment, setDownloadAttachment] = useState(null);
+  const [deleteFile, setDeleteFile] = useState(null);
+
   const apiKey = authState.token;
   const email = authState.user.email;
 
@@ -30,8 +33,21 @@ export const Dashboard = () => {
       dispatch(getFilesAction({ getFilesFromServer, email, apiKey }))
       setGetFilesFromServer(false);
     }
+    if (downloadAttachment !== null) {
+      dispatch(fileDownloadAction({ ...downloadAttachment, apiKey }))
+      setDownloadAttachment(null);
+    }
+    if (deleteFile !== null) {
+      console.log('triggered deleteFileAction');
+      dispatch(deleteFileAction(deleteFile))
+      setDeleteFile(null);
+    }
 
-  }, [dispatch, files, getFilesList, setFiles, uploadedFiles, email, setUploadedFiles, hasUploaded, setHasUploaded, getUploadedFiles, setGetUploadedFiles, getFilesFromServer, setGetFilesFromServer]);
+  }, [dispatch, files, getFilesList, setFiles,
+    uploadedFiles, email, setUploadedFiles,
+    hasUploaded, setHasUploaded, getUploadedFiles,
+    setGetUploadedFiles, getFilesFromServer, setGetFilesFromServer,
+    downloadAttachment, setDownloadAttachment, deleteFile, setDeleteFile]);
 
   function getFilesList() {
     const files = uploadState.files;
@@ -43,10 +59,10 @@ export const Dashboard = () => {
             <td>{parseFloat(r.fileSize / 1024).toFixed(0)} KB</td>
             <td>{moment(r.uploadedDate).format('YYYY-MM-DD HH:mm:ss')}</td>
             <td>{r.fileStatus}</td>
-            <td>{r.fileStatus === 'DONE' ? (<div>
-              <Button variant="link"><i className="fa fa-download" onClick={() => {downloadRecord(r)}}></i></Button>
-              <Button variant="link" ><i className="fa fa-edit" onClick={() => {editRecord(r)}}></i></Button>
-              <Button variant="link" className="text-danger" onClick={() => {deleteRecord(r)}}><i className="fa fa-trash"></i></Button>
+            <td>{r.fileStatus === 'ZIPPED' ? (<div>
+              <Button variant="link"><i className="fa fa-download" onClick={() => { downloadRecord(r) }}></i></Button>
+              <Button variant="link" ><i className="fa fa-edit" onClick={() => { editRecord(r) }}></i></Button>
+              <Button variant="link" className="text-danger" onClick={() => { deleteRecord(r) }}><i className="fa fa-trash"></i></Button>
             </div>) : null}</td>
           </tr>
         );
@@ -82,11 +98,12 @@ export const Dashboard = () => {
   }
 
   function deleteRecord(record) {
-
+    setDeleteFile({ ...record, apiKey });
   }
 
   function downloadRecord(record) {
-
+    console.log('record ', record);
+    setDownloadAttachment(record);
   }
 
   return (

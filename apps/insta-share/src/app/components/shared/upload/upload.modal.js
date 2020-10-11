@@ -24,7 +24,6 @@ export const UploadModal = (props) => {
     }
 
     async function updateInformation() {
-        console.log('data ', data);
         const currentDate = moment.now();
         let formData = new FormData();
         if(fileName === '' && file === null) {
@@ -41,7 +40,6 @@ export const UploadModal = (props) => {
         formData.append('uploadedDate', currentDate);
         formData.append('fileId', uploadState.showModal.data.id);
         const result = await store.dispatch(fileUpdateAction({formData, apiKey}));
-        console.log('result ', result);
         if(result && result.payload.status) {
             closeModal();
             props.loadRecords(true);
@@ -53,7 +51,7 @@ export const UploadModal = (props) => {
             <div>
                 <div className="form-group">
                     <label>FileName</label>
-                    <input type="text" value={fileName} placeholder={uploadState.showModal.data && uploadState.showModal.data.fileName ? uploadState.showModal.data.fileName : ''} className="form-control" onChange={(e) => { setFileName(e.target.value) }} />
+                    <input type="text" value={fileName} placeholder={uploadState.showModal && uploadState.showModal.data && uploadState.showModal.data.fileName ? uploadState.showModal.data.fileName : ''} className="form-control" onChange={(e) => { setFileName(e.target.value) }} />
                 </div>
                 <div className="form-group">
                     <label>File</label>

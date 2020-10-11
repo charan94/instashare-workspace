@@ -61,7 +61,6 @@ export class UtilController {
     )
     async updateFile(@UploadedFile() file, @Body() body) {
         const fileId = parseInt(body.fileId);
-        console.log('file ', file);
         const fileName = body.fileName;
         const uploadedDate = body.uploadedDate;
         const result = await this.utilService.updateFile(fileId, fileName, uploadedDate, file);

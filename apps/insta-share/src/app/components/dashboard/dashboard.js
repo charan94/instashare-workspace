@@ -100,7 +100,6 @@ export const Dashboard = () => {
 
   async function deleteRecord(record) {
     const res = await store.dispatch(fileDeleteAction({...record, apiKey}));
-    console.log('res ', res);
     if(res.payload.status == true) {
       setGetFilesFromServer(true);
     }

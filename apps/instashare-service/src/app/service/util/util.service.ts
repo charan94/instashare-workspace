@@ -61,11 +61,9 @@ export class UtilService {
     }
 
     async saveFileInRDS(instaFile, id, mongoId) {
-        console.log('id ', id);
         const updatedFile = { ...instaFile };
         updatedFile.fileStatus = UPLOAD_STATUS.ZIPPED;
         const result = !id ? await this.instaFileRepo.save(updatedFile) : await this.instaFileRepo.update({id: id}, {...updatedFile, id: id});
-        console.log('result ', result);
         await this.instFileModel.findOne({ _id: mongoId }).update({ id: id ? id : result.id, fileStatus: UPLOAD_STATUS.ZIPPED, file: instaFile.file });
     }
 

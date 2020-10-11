@@ -1,29 +1,23 @@
 import React, { Component } from 'react';
 import './app.scss';
-import { ReactComponent as Logo } from './logo.svg';
-import star from './star.svg';
-import { Route, Link } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import TopBar from './components/shared/top-bar/top-bar';
+import PrivateRoute from './components/private-route/private-route';
 import Dashboard from './components/dashboard/dashboard';
+import Auth from './components/auth/auth';
+import InstaAlert from './components/shared/insta-alert/insta-alert';
 
 export class App extends Component {
   render() {
     return (
       <div>
-        <Route
-          path="/"
-          exact
-          component={Dashboard}
-        />
-        <Route
-          path="/page-2"
-          exact
-          render={() => (
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          )}
-        />
-        {/* END: routes */}
+        <TopBar />
+        <InstaAlert />
+        <Switch>
+            <Route key="authKey" path={`/auth/:name`} component={Auth}  />
+            <PrivateRoute path="/" component={Dashboard} />
+            <Redirect key="login-redirect" to="/auth/login" />
+        </Switch>
       </div>
     );
   }

@@ -1,4 +1,3 @@
-import { InstaFile } from './../../models/insta-file.entity';
 import { User } from './../../models/user.entity';
 import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,7 +6,7 @@ import { UserModel } from '../../models/user';
 
 @Injectable()
 export class UserService {
-    constructor(@InjectRepository(User) private userRepo: Repository<User>, @InjectRepository(InstaFile) private instaFileRepo: Repository<InstaFile>) { }
+    constructor(@InjectRepository(User) private userRepo: Repository<User>) { }
 
     public async findAll(): Promise<User[]> {
         return await this.userRepo.find();

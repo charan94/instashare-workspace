@@ -15,7 +15,6 @@ export class AuthService {
         const expiresIn = 3600;
         const accessToken = jwt.sign(
             {
-                id: user.id,
                 email: user.email,
                 firstname: user.firstName,
                 lastname: user.lastName,
@@ -35,7 +34,11 @@ export class AuthService {
 
     async validateUser(email: string, password: string): Promise<UserModel> {
         const user = await this.userService.findByEmail(email);
-        if (user && user.comparePassword(password)) {
+        if(!user) {
+            return null;
+        }
+        const isValidated = await user.comparePassword(password);
+        if (isValidated) {
             const { password, ...result } = user;
             return result;
         }

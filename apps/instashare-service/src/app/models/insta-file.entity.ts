@@ -14,17 +14,17 @@ export class InstaFile {
     fileStatus: string;
 
     @Column()
-    fileSize: string;
+    fileSize: number;
 
     @Column()
     uploadedDate: number;
 
+    @Column()
+    mimeType: string;
+
     @Column({type: 'blob'})
     file: any;
 
-    @Column({type: 'blob'})
-    modifiedFile: any;
-
-    @ManyToOne(type => User, user => user.files)
+    @ManyToOne('User', 'files')
     user: User;
 }

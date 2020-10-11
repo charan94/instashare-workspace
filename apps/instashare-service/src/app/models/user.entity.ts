@@ -27,7 +27,7 @@ export class User {
     @Column()
     password: string;
 
-    @OneToMany(type => InstaFile, instaFile => instaFile.user)
+    @OneToMany('InstaFile', 'user')
     files: InstaFile[];
 
     @BeforeInsert()

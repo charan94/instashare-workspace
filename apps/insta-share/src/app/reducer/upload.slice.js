@@ -39,7 +39,6 @@ export const getFilesAction = createAsyncThunk(
 export const fileDownloadAction = createAsyncThunk(
   'upload/attachment/download',
   async (payload, thunkAPI) => {
-    console.log('payload ', payload);
     const url = `${environment.API_URL}/util/file/${payload.id}`;
     const response = await fetch(url, {
       method: 'GET',
@@ -53,10 +52,9 @@ export const fileDownloadAction = createAsyncThunk(
 export const fileDeleteAction = createAsyncThunk(
   'upload/file/delete',
   async (payload, thunkAPI) => {
-    console.log('payload ', payload);
     const url = `${environment.API_URL}/util/file/delete/${payload.id}`;
     const response = await fetch(url, {
-      method: 'POST',
+      method: 'DELETE',
       headers: { 'Authorization': `Bearer ${payload.apiKey}` }
     });
     return response.json();
@@ -99,18 +97,6 @@ export const uploadSlice = createSlice({
           state.files = [...files, ...action.payload.data];
         }
       })
-      .addCase(fileDeleteAction.pending, (state, action) => {
-        console.log('action ', action);
-        const files = state.files.filter(r => r.id === action.meta.arg.data.id);
-        state.files = state.tempFiles = [...files]
-      })
-      .addCase(fileDeleteAction.fulfilled, (state, action) => {
-        console.log('action ', action);
-        if (action.payload && action.payload.status) {
-          const files = state.files;
-          state.files = [...files.filter(r => r.id !== action.payload.id)]
-        }
-      })
       .addCase(fileDownloadAction.fulfilled, (state, action) => {
         if (action.payload && action.payload.data && action.payload.data.file) {
           const dataURI = `data:text/zip;base64,${action.payload.data.file}`;
@@ -118,7 +104,6 @@ export const uploadSlice = createSlice({
           saveAs(dataURI, `${fileName.substring(0, fileName.lastIndexOf('.'))}.zip`);
         }
       })
-
   },
 });
 

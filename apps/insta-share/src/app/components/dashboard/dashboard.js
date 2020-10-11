@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { store } from '../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
-import { fileDeleteAction, fileDownloadAction, fileUploadAction, getFilesAction, getUploadState } from '../../reducer/upload.slice';
+import { fileDeleteAction, fileDownloadAction, fileUploadAction, getFilesAction, getUploadState, uploadReducer } from '../../reducer/upload.slice';
 import './dashboard.scss';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
@@ -16,7 +17,6 @@ export const Dashboard = () => {
   const [files, setFiles] = useState({ formData: [] });
   const [uploadedFiles, setUploadedFiles] = useState({ formData: [] });
   const [hasUploaded, setHasUploaded] = useState(false);
-  const [getUploadedFiles, setGetUploadedFiles] = useState(false);
   const [getFilesFromServer, setGetFilesFromServer] = useState(true);
   const [downloadAttachment, setDownloadAttachment] = useState(null);
   const [deleteFile, setDeleteFile] = useState(null);
@@ -32,6 +32,7 @@ export const Dashboard = () => {
     if (getFilesFromServer) {
       dispatch(getFilesAction({ getFilesFromServer, email, apiKey }))
       setGetFilesFromServer(false);
+      startRefreshTimer();
     }
     if (downloadAttachment) {
       dispatch(fileDownloadAction({ ...downloadAttachment, apiKey }))
@@ -39,14 +40,14 @@ export const Dashboard = () => {
     }
     if (deleteFile) {
       dispatch(fileDeleteAction({...deleteFile, apiKey}));
+      dispatch(uploadReducer.action.delete(deleteFile))
       setDeleteFile(null);
     }
 
   }, [dispatch, files, getFilesList, setFiles,
     uploadedFiles, email, setUploadedFiles,
-    hasUploaded, setHasUploaded, getUploadedFiles,
-    setGetUploadedFiles, getFilesFromServer, setGetFilesFromServer,
-    downloadAttachment, setDownloadAttachment, deleteFile, setDeleteFile]);
+    hasUploaded, setHasUploaded, getFilesFromServer, setGetFilesFromServer,
+    downloadAttachment, setDownloadAttachment, deleteFile, setDeleteFile, startRefreshTimer]);
 
   function getFilesList() {
     const files = uploadState.files;
@@ -96,13 +97,33 @@ export const Dashboard = () => {
 
   }
 
-  function deleteRecord(record) {
-    setDeleteFile(record);
+  async function deleteRecord(record) {
+    const res = await store.dispatch(fileDeleteAction({...record, apiKey}));
+    console.log('res ', res);
+    if(res.payload.status == true) {
+      setGetFilesFromServer(true);
+    }
   }
 
   function downloadRecord(record) {
-    console.log('record ', record);
     setDownloadAttachment(record);
+  }
+
+  // refresh every 3 mins
+  function startRefreshTimer() {
+    let start = +new Date();
+    let interval = setInterval(
+      function() {
+        let now = +new Date();
+        let count = Math.round((now - start) / 1000);
+        if (count === 30) {
+          setGetFilesFromServer(true);
+          clearInterval(interval);
+          interval = null;
+        }
+      }.bind(this),
+      1000
+    );
   }
 
   return (

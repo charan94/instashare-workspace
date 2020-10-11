@@ -73,7 +73,7 @@ export class UtilService {
     }
 
     async markForDelete(fileId) {
-        const deletedFile = await this.instFileModel.findById({id: fileId});
+        const deletedFile = await this.instFileModel.findOne({id: fileId});
         deletedFile.fileStatus = UPLOAD_STATUS.MARKED_TO_DELETE;
         await this.instFileModel.findByIdAndUpdate(deletedFile._id, deletedFile);
     }

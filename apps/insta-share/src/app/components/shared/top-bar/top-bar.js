@@ -18,7 +18,12 @@ export const TopBar = () => {
   }, [dispatch, logout, setLogout]);
 
   function getTitle() {
-    return `Welcome ${authState.user.firstName} ${authState.user.lastName}`
+    return `Welcome ${authState.user.firstName}`
+  }
+
+  function signout() {
+    localStorage.clear();
+    setLogout(true);
   }
 
   function getActionButtons() {
@@ -28,7 +33,7 @@ export const TopBar = () => {
           <span className="text-white">{getTitle()}</span>
         </li>
         <li className="nav-item d-none d-block ml-lg-4">
-          <Button variant="link" color="dark" className="logout-btn" onClick={(e) => setLogout(true)}>
+          <Button variant="link" color="dark" className="logout-btn" onClick={() => signout()}>
             <span>
               <i className="fa fa-sign-out mr-2"></i>
             </span>

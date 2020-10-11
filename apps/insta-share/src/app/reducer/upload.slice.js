@@ -61,12 +61,25 @@ export const fileDeleteAction = createAsyncThunk(
   }
 )
 
+export const fileUpdateAction = createAsyncThunk(
+  'upload/file/update',
+  async (payload, thunkAPI) => {
+    const url = `${environment.API_URL}/util/file`;
+    const response = await fetch(url, {
+      method: 'PUT',
+      body: payload.formData,
+      headers: { 'Authorization': `Bearer ${payload.apiKey}`, 'type': 'formData' }
+    });
+    return response.json();
+  }
+)
+
 export const initialUploadState = uploadAdapter.getInitialState({
   error: null,
-  upload: false,
   files: [],
   tempFiles: [],
-  editFile: null
+  editFile: null,
+  showModal: {show: false, data: null}
 });
 
 export const uploadSlice = createSlice({
@@ -75,6 +88,9 @@ export const uploadSlice = createSlice({
   reducers: {
     add: uploadAdapter.addOne,
     remove: uploadAdapter.removeOne,
+    showModal: (state, action) => {
+      state.showModal = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder

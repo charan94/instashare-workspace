@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { store } from '../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
-import { fileDeleteAction, fileDownloadAction, fileUploadAction, getFilesAction, getUploadState, uploadReducer } from '../../reducer/upload.slice';
+import { fileDeleteAction, fileDownloadAction, fileUploadAction, getFilesAction, getUploadState, uploadReducer, uploadSlice } from '../../reducer/upload.slice';
 import './dashboard.scss';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import moment from 'moment';
 import Button from 'react-bootstrap/Button';
 import { getAuthState } from '../../reducer/auth.slice';
+import { UploadModal } from '../shared/upload/upload.modal';
 
 export const Dashboard = () => {
 
@@ -94,7 +95,7 @@ export const Dashboard = () => {
   }
 
   function editRecord(record) {
-
+    store.dispatch(uploadSlice.actions.showModal({show: true, data: record}));
   }
 
   async function deleteRecord(record) {
@@ -116,7 +117,7 @@ export const Dashboard = () => {
       function() {
         let now = +new Date();
         let count = Math.round((now - start) / 1000);
-        if (count === 300) {
+        if (count === 60) {
           setGetFilesFromServer(true);
           clearInterval(interval);
           interval = null;
@@ -152,6 +153,7 @@ export const Dashboard = () => {
           </div>
         </div>
       </div>
+      <UploadModal loadRecords={setGetFilesFromServer} />
     </div>
   );
 }

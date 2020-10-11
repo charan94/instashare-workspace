@@ -60,11 +60,13 @@ export class UtilService {
         return await this.instFileModel.find({ fileStatus: UPLOAD_STATUS.UPLOADED }).limit(limit);
     }
 
-    async saveFileInRDS(instaFile, id) {
+    async saveFileInRDS(instaFile, id, mongoId) {
+        console.log('id ', id);
         const updatedFile = { ...instaFile };
         updatedFile.fileStatus = UPLOAD_STATUS.ZIPPED;
-        const result = await this.instaFileRepo.save(updatedFile);
-        await this.instFileModel.findOne({ _id: id }).update({ id: result.id, fileStatus: UPLOAD_STATUS.ZIPPED, file: instaFile.file });
+        const result = !id ? await this.instaFileRepo.save(updatedFile) : await this.instaFileRepo.update({id: id}, {...updatedFile, id: id});
+        console.log('result ', result);
+        await this.instFileModel.findOne({ _id: mongoId }).update({ id: id ? id : result.id, fileStatus: UPLOAD_STATUS.ZIPPED, file: instaFile.file });
     }
 
     async getFileById(fileId) {
@@ -95,6 +97,21 @@ export class UtilService {
     async deleteFile(fileId) {
         await this.instFileModel.deleteOne({id: fileId});
         return true;
+    }
+
+    async updateFile(fileId, fileName, uploadedDate, file) {
+        const currentRecord = await this.instFileModel.findOne({id: fileId});
+        if(file) {
+            currentRecord.file = file.buffer.toString('base64');
+            currentRecord.uploadedDate = uploadedDate;
+            currentRecord.fileStatus = UPLOAD_STATUS.UPLOADED;
+        }
+
+        if(fileName !== '') {
+            currentRecord.fileName = fileName;
+        }
+        await this.instFileModel.updateOne({id: fileId}, currentRecord);
+        return {status: true};
     }
 
 }

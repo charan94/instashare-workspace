@@ -1,8 +1,8 @@
 import { UserService } from './../../user/service/user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UtilService } from './../../service/util/util.service';
-import { Controller, Post, UploadedFiles, UseInterceptors, Logger, UseGuards, Body, Get, Query, HttpException, Param, Delete, Put } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { Controller, Post, UploadedFiles, UseInterceptors, Logger, UseGuards, Body, Get, Query, HttpException, Param, Delete, Put, UploadedFile } from '@nestjs/common';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('util')
 export class UtilController {
@@ -55,12 +55,16 @@ export class UtilController {
     }
 
     @UseGuards(AuthGuard('jwt'))
-    @Put('/file/:id')
+    @Put('/file')
     @UseInterceptors(
-        FilesInterceptor('insta-file')
+        FileInterceptor('insta-file')
     )
-    async editFile(@Param('id') id: number, @Body() body) {
-        const result = await this.utilService.deleteFile(id);
-        return { data: result };
+    async updateFile(@UploadedFile() file, @Body() body) {
+        const fileId = parseInt(body.fileId);
+        console.log('file ', file);
+        const fileName = body.fileName;
+        const uploadedDate = body.uploadedDate;
+        const result = await this.utilService.updateFile(fileId, fileName, uploadedDate, file);
+        return result;
     }
 }

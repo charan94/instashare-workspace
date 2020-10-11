@@ -38,7 +38,7 @@ export class SchedulerService {
                 uploadedDate: record.uploadedDate,
                 user: user
             }
-            await this.utilService.saveFileInRDS(file, record._id);
+            await this.utilService.saveFileInRDS(file, record.id, record._id);
             if(i === records.length - 1) {
                 this.logger.log('******************EXITING ZIPP SCHEDULER - DONE**************');
             }

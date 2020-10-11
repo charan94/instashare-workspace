@@ -1,29 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fileUploadAction, getUploadState } from '../../reducer/upload.slice';
-import UploadModal from '../shared/upload-modal/upload-modal';
+import { fileUploadAction, getFilesAction, getUploadState } from '../../reducer/upload.slice';
 import './dashboard.scss';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import moment from 'moment';
 import Button from 'react-bootstrap/Button';
+import { getAuthState } from '../../reducer/auth.slice';
 
 export const Dashboard = () => {
 
   const dispatch = useDispatch();
   const uploadState = useSelector(getUploadState);
-  const [files, setFiles] = useState({ data: [], formData: [] });
-  const [uploadedFiles, setUploadedFiles] = useState({ data: [], formData: [] });
+  const authState = useSelector(getAuthState);
+  const [files, setFiles] = useState({ formData: [] });
+  const [uploadedFiles, setUploadedFiles] = useState({ formData: [] });
   const [hasUploaded, setHasUploaded] = useState(false);
   const [getUploadedFiles, setGetUploadedFiles] = useState(false);
+  const [getFilesFromServer, setGetFilesFromServer] = useState(true);
+  const apiKey = authState.token;
+  const email = authState.user.email;
 
   useEffect(() => {
     if (hasUploaded) {
-      dispatch(fileUploadAction(files));
+      dispatch(fileUploadAction(uploadedFiles));
       setHasUploaded(false);
     }
+    if (getFilesFromServer) {
+      dispatch(getFilesAction({ getFilesFromServer, email, apiKey }))
+      setGetFilesFromServer(false);
+    }
 
-  }, [dispatch, files, setFiles, uploadedFiles, setUploadedFiles, hasUploaded, setHasUploaded, getUploadedFiles, setGetUploadedFiles]);
+  }, [dispatch, files, getFilesList, setFiles, uploadedFiles, email, setUploadedFiles, hasUploaded, setHasUploaded, getUploadedFiles, setGetUploadedFiles, getFilesFromServer, setGetFilesFromServer]);
 
   function getFilesList() {
     const files = uploadState.files;
@@ -34,12 +42,12 @@ export const Dashboard = () => {
             <td>{r.fileName}</td>
             <td>{parseFloat(r.fileSize / 1024).toFixed(0)} KB</td>
             <td>{moment(r.uploadedDate).format('YYYY-MM-DD HH:mm:ss')}</td>
-            <td>{r.status}</td>
-            <td>{ r.status === 'DONE' ? (<div>
-              <Button variant="link"><i className="fa fa-download"></i></Button>
-              <Button variant="link" ><i className="fa fa-edit"></i></Button>
-              <Button variant="link" className="text-danger" ><i className="fa fa-trash"></i></Button>
-            </div>) : null }</td>
+            <td>{r.fileStatus}</td>
+            <td>{r.fileStatus === 'DONE' ? (<div>
+              <Button variant="link"><i className="fa fa-download" onClick={() => {downloadRecord(r)}}></i></Button>
+              <Button variant="link" ><i className="fa fa-edit" onClick={() => {editRecord(r)}}></i></Button>
+              <Button variant="link" className="text-danger" onClick={() => {deleteRecord(r)}}><i className="fa fa-trash"></i></Button>
+            </div>) : null}</td>
           </tr>
         );
       })
@@ -52,19 +60,33 @@ export const Dashboard = () => {
 
   function uploadFile(fileList) {
     let formData = new FormData();
-    let uploadedFiles = [];
     const currentDate = moment.now();
+    let uploadedFiles = [];
     for (let key of Object.keys(fileList)) {
       formData.append('insta-file', fileList[key]);
       uploadedFiles.push({
         fileName: fileList[key].name,
         fileSize: fileList[key].size,
         uploadedDate: currentDate,
-        status: 'DONE'
+        fileStatus: 'UPLOADING'
       });
     }
-    setFiles({ data: uploadedFiles, formData });
+    formData.append('uploadedDate', currentDate);
+    formData.append('email', authState.user.email);
+    setUploadedFiles({ data: uploadedFiles, formData, apiKey });
     setHasUploaded(true);
+  }
+
+  function editRecord(record) {
+
+  }
+
+  function deleteRecord(record) {
+
+  }
+
+  function downloadRecord(record) {
+
   }
 
   return (
@@ -93,7 +115,6 @@ export const Dashboard = () => {
           </div>
         </div>
       </div>
-      <UploadModal />
     </div>
   );
 }

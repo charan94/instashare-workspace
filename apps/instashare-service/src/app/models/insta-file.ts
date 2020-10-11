@@ -5,5 +5,6 @@ export class InstaFileModel {
     fileSize: string;
     uploadedDate: number;
     file: any;
-    modifiedFile: any;
+    modifiedFile?: any;
+    mimeType: string;
 }

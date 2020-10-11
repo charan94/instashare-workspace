@@ -19,12 +19,12 @@ export class InstaFile {
     @Column()
     uploadedDate: number;
 
+    @Column()
+    mimeType: string;
+
     @Column({type: 'blob'})
     file: any;
 
-    @Column({type: 'blob'})
-    modifiedFile: any;
-
-    @ManyToOne(type => User, user => user.files)
+    @ManyToOne('User', 'files')
     user: User;
 }

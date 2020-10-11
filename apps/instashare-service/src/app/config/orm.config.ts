@@ -7,5 +7,8 @@ export const ORM_CONFIG:TypeOrmModuleOptions = {
     "username": "instashareuser",
     "password": "Passw0rd12",
     "database": "instashare",
-    "synchronize": true
+    "synchronize": true,
+    "multipleStatements": true
 }
+
+export const MONGO_URL = `mongodb+srv://instashareuser:Passw0rd12@cluster0.kifre.mongodb.net/insta-share?retryWrites=true&w=majority`

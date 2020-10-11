@@ -11,7 +11,7 @@ export const UPLOAD_FEATURE_KEY = 'upload';
 export const uploadAdapter = createEntityAdapter();
 
 export const fileUploadAction = createAsyncThunk(
-  'upload/file',
+  'upload/file/upload',
   async (payload, thunkAPI) => {
     const url = `${environment.API_URL}/util/upload`;
     const response = await fetch(url, {
@@ -24,7 +24,7 @@ export const fileUploadAction = createAsyncThunk(
 )
 
 export const getFilesAction = createAsyncThunk(
-  'upload/get/files',
+  'upload/files/get',
   async (payload, thunkAPI) => {
     const url = `${environment.API_URL}/util/files`;
     const response = await fetch(url, {
@@ -37,7 +37,7 @@ export const getFilesAction = createAsyncThunk(
 )
 
 export const fileDownloadAction = createAsyncThunk(
-  '/upload/attachment/download',
+  'upload/attachment/download',
   async (payload, thunkAPI) => {
     console.log('payload ', payload);
     const url = `${environment.API_URL}/util/file/${payload.id}`;
@@ -50,20 +50,13 @@ export const fileDownloadAction = createAsyncThunk(
   }
 )
 
-export const showUploadModalAction = createAsyncThunk(
-  'upload/showUploadModal',
-  async (payload, thunkAPI) => {
-    return payload;
-  }
-)
-
-export const deleteFileAction = createAsyncThunk(
+export const fileDeleteAction = createAsyncThunk(
   'upload/file/delete',
   async (payload, thunkAPI) => {
     console.log('payload ', payload);
     const url = `${environment.API_URL}/util/file/delete/${payload.id}`;
     const response = await fetch(url, {
-      method: 'DELETE',
+      method: 'POST',
       headers: { 'Authorization': `Bearer ${payload.apiKey}` }
     });
     return response.json();
@@ -73,7 +66,6 @@ export const deleteFileAction = createAsyncThunk(
 export const initialUploadState = uploadAdapter.getInitialState({
   error: null,
   upload: false,
-  showUploadModal: false,
   files: [],
   tempFiles: [],
   editFile: null
@@ -88,31 +80,35 @@ export const uploadSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fileUploadAction.pending, (state, action) => {
-        const files = state.files;
-        state.tempFiles = files
-        state.files = [...files, ...action.meta.arg.data];
-      })
-    builder
-      .addCase(fileUploadAction.fulfilled, (state, action) => {
-        if (action.payload && action.payload.status && action.payload.data) {
-          const files = state.tempFiles;
-          state.files = [...files, ...action.payload.data];
-        }
-      })
-      .addCase(fileUploadAction.rejected, (state, action) => {
-        state.loadingStatus = 'error';
-        state.error = action.error.message;
-      })
-      .addCase(showUploadModalAction.fulfilled, (state, action) => {
-        state.showUploadModal = action.payload;
-      })
       .addCase(getFilesAction.fulfilled, (state, action) => {
         state.reload = false;
         if (action.payload && action.payload.data) {
           state.files = [...action.payload.data];
         } else {
           state.files = [];
+        }
+      })
+      .addCase(fileUploadAction.pending, (state, action) => {
+        const files = state.files;
+        state.tempFiles = files
+        state.files = [...files, ...action.meta.arg.data];
+      })
+      .addCase(fileUploadAction.fulfilled, (state, action) => {
+        if (action.payload && action.payload.status && action.payload.data) {
+          const files = state.tempFiles;
+          state.files = [...files, ...action.payload.data];
+        }
+      })
+      .addCase(fileDeleteAction.pending, (state, action) => {
+        console.log('action ', action);
+        const files = state.files.filter(r => r.id === action.meta.arg.data.id);
+        state.files = state.tempFiles = [...files]
+      })
+      .addCase(fileDeleteAction.fulfilled, (state, action) => {
+        console.log('action ', action);
+        if (action.payload && action.payload.status) {
+          const files = state.files;
+          state.files = [...files.filter(r => r.id !== action.payload.id)]
         }
       })
       .addCase(fileDownloadAction.fulfilled, (state, action) => {
@@ -122,18 +118,7 @@ export const uploadSlice = createSlice({
           saveAs(dataURI, `${fileName.substring(0, fileName.lastIndexOf('.'))}.zip`);
         }
       })
-      .addCase(deleteFileAction.pending, (state, action) => {
-        console.log('action ', action);
-        const files = state.files.filter(r => r.id === action.meta.arg.data.id);
-        state.files = state.tempFiles = [...files]
-      })
-      .addCase(deleteFileAction.fulfilled, (state, action) => {
-        console.log('action ', action);
-        if (action.payload && action.payload.status) {
-          const files = state.files;
-          state.files = [...files.filter(r => r.id !== action.payload.id)]
-        }
-      })
+
   },
 });
 

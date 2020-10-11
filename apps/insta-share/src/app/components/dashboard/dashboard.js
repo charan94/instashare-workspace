@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteFileAction, fileDownloadAction, fileUploadAction, getFilesAction, getUploadState } from '../../reducer/upload.slice';
+import { fileDeleteAction, fileDownloadAction, fileUploadAction, getFilesAction, getUploadState } from '../../reducer/upload.slice';
 import './dashboard.scss';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
@@ -33,13 +33,12 @@ export const Dashboard = () => {
       dispatch(getFilesAction({ getFilesFromServer, email, apiKey }))
       setGetFilesFromServer(false);
     }
-    if (downloadAttachment !== null) {
+    if (downloadAttachment) {
       dispatch(fileDownloadAction({ ...downloadAttachment, apiKey }))
       setDownloadAttachment(null);
     }
-    if (deleteFile !== null) {
-      console.log('triggered deleteFileAction');
-      dispatch(deleteFileAction(deleteFile))
+    if (deleteFile) {
+      dispatch(fileDeleteAction({...deleteFile, apiKey}));
       setDeleteFile(null);
     }
 
@@ -98,7 +97,7 @@ export const Dashboard = () => {
   }
 
   function deleteRecord(record) {
-    setDeleteFile({ ...record, apiKey });
+    setDeleteFile(record);
   }
 
   function downloadRecord(record) {
@@ -109,7 +108,7 @@ export const Dashboard = () => {
   return (
     <div className="dashboard-page container-fluid pt-5 pl-5">
       <div className="row">
-        <h5>Uploaded Files</h5>
+        <h5>Your Files</h5>
       </div>
       <div className="row pt-5">
         <div className="col-lg-12 pl-0">

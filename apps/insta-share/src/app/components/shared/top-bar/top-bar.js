@@ -4,13 +4,10 @@ import './top-bar.scss';
 import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
 import { getAuthState, triggerLogout } from '../../../reducer/auth.slice';
-import { getUploadState, showUploadModalAction } from '../../../reducer/upload.slice';
 
 export const TopBar = () => {
   const dispatch = useDispatch();
   const authState = useSelector(getAuthState);
-  const updateState = useSelector(getUploadState);
-  const [upload, setUpload] = useState(false);
   const [logout, setLogout] = useState(false);
 
   useEffect(() => {
@@ -18,23 +15,17 @@ export const TopBar = () => {
       dispatch(triggerLogout(logout));
       setLogout(false);
     }
-    if(upload) {
-      dispatch(showUploadModalAction(true));
-      setUpload(false);
-    }
-  }, [dispatch, logout, setLogout, upload, setUpload]);
+  }, [dispatch, logout, setLogout]);
 
+  function getTitle() {
+    return `Welcome ${authState.user.firstName} ${authState.user.lastName}`
+  }
 
   function getActionButtons() {
     return authState.isAuthenticated ? (
       <ul className="navbar-nav align-items-lg-center ml-auto">
         <li className="nav-item d-none d-block ml-lg-4">
-          <Button variant="link" color="dark" className="upload-btn" onClick={() => setUpload(true)}>
-            <span>
-              <i className="fa fa-cloud-upload mr-2"></i>
-            </span>
-            <span>Upload</span>
-          </Button>
+          <span className="text-white">{getTitle()}</span>
         </li>
         <li className="nav-item d-none d-block ml-lg-4">
           <Button variant="link" color="dark" className="logout-btn" onClick={(e) => setLogout(true)}>

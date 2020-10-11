@@ -23,7 +23,7 @@ export class UtilService {
                     fileStatus: UPLOAD_STATUS.UPLOADED,
                     fileSize: file.size,
                     uploadedDate: uploadedDate,
-                    file: file.buffer.toString(),
+                    file: file.buffer.toString('base64'),
                     mimeType: file.mimetype,
                     userId: user.id
                 }

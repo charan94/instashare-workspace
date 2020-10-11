@@ -66,7 +66,7 @@ export class SchedulerService {
 
     async zipFile(file, name) {
         let zip = new JSZip();
-        zip.file(name, file, { binary: true });
+        zip.file(name, file, { base64: true });
         return await zip.generateAsync({type: 'base64'})
     }
 

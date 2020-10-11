@@ -116,7 +116,7 @@ export const Dashboard = () => {
       function() {
         let now = +new Date();
         let count = Math.round((now - start) / 1000);
-        if (count === 30) {
+        if (count === 300) {
           setGetFilesFromServer(true);
           clearInterval(interval);
           interval = null;
